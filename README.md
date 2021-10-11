@@ -17,7 +17,7 @@ Username:
 Password:
 ```
 
-# Notes
+# Important Notes
 
 1. Running it too frequently may trigger password reset.
-2. Made to work with M2U personnal account type as of 11 Oct 2021. Future updates on UI will break code.
+2. Made to work with M2U personnal account type as of 11 Oct 2021. Future updates on UI may break code.
