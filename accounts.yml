@@ -1,0 +1,12 @@
+accounts: 
+  - name: Savings Account-i
+    days: 90
+  - name: Maybank2u.Premier
+    days: 60
+  - name: MAE
+    days: 60
+  - name: M2U Savers
+    days: 90
+cards:
+  - name: Maybankard 2 Visa Platinum
+  - name: Maybankard 2 Amex Platinum
