@@ -2,7 +2,7 @@ Export Maybank transactions into QIF files
 
 # How to use
 
-1. Install Chrome webdriver https://chromedriver.storage.googleapis.com/index.html (find same version with installed Chrome)
+1. Download Chrome webdriver https://chromedriver.storage.googleapis.com/index.html (find same version with installed Chrome) and add to $PATH directories (e.g. `/usr/local/bin`)
 
 2. Change `accounts.yml`.
 
