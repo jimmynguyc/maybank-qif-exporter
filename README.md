@@ -21,4 +21,4 @@ Password:
 
 1. Running it too frequently may trigger password reset.
 2. Made to work with M2U personnal account as of 11 Oct 2021. Future updates on UI may break code.
-3. Works for on macOS Big Sur & Chrome 94.0.4606.81 & ChromeDriver 94.0.4606.61, might not work with different setup. PR welcomed.
+3. Works on macOS Big Sur & Chrome 94.0.4606.81 & ChromeDriver 94.0.4606.61, might not work with different setup. PR welcomed.
