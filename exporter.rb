@@ -7,7 +7,7 @@ require "byebug"
 def finishLoading(browser, wait)
   begin
     browser.find_element(:xpath, "//div[contains(@class, 'LoaderNew---overlay')]").displayed?
-  rescue Selenium::WebDriver::Error::NoSuchElementError
+  rescue Selenium::WebDriver::Error::NoSuchElementError, Selenium::WebDriver::Error::StaleElementReferenceError
     return
   end
 
@@ -20,6 +20,14 @@ def sanitize_td(text)
   text.split("  ").map(&:strip).reject(&:empty?).join(" ")
 end
 
+def retryable_click(element)
+  begin
+    element.click
+  rescue Selenium::WebDriver::Error::ElementClickInterceptedError
+    element.click # retry once
+  end
+end
+
 def parse_table(browser, wait, days, type, first = true, transactions = [], page = 1)
   if first && type == :accounts
     puts "Looking for #{days} days of transactions ..."
@@ -27,11 +35,11 @@ def parse_table(browser, wait, days, type, first = true, transactions = [], page
     wait.until {
       browser.find_element(:id, "daysType").displayed?
     }
-    browser.find_element(:id, "daysType").click
+    retryable_click(browser.find_element(:id, "daysType"))
     wait.until {
       browser.find_element(:xpath, "//span[text()='Last #{days} days']").displayed?
     }
-    browser.find_element(:xpath, "//span[text()='Last #{days} days']").click
+    retryable_click(browser.find_element(:xpath, "//span[text()='Last #{days} days']"))
   end
 
   finishLoading(browser, wait)
@@ -64,31 +72,27 @@ def parse_table(browser, wait, days, type, first = true, transactions = [], page
       wait.until {
         next_button.displayed?
       }
-      begin
-        next_button.click
-      rescue Selenium::WebDriver::Error::ElementClickInterceptedError
-        next_button.click # retry once
-      end
+      retryable_click(next_button)
       page += 1
       parse_table(browser, wait, days, type, false, transactions, page)
     end
   end
 
-  puts "Done parsing ..."
   transactions
 end
 
 def export_to_file(browser, wait, acc_name, days, type)
-  puts "Exporting #{acc_name} ..."
+  puts "Exporting #{acc_name} transactions ..."
   finishLoading(browser, wait)
   if type == :accounts
-    browser.find_element(:xpath, "//div[text()='ACCOUNTS']").click
+    retryable_click(browser.find_element(:xpath, "//div[text()='ACCOUNTS']"))
   elsif type == :cards
-    browser.find_element(:xpath, "//div[text()='CARDS']").click
+    retryable_click(browser.find_element(:xpath, "//div[text()='CARDS']"))
   end
   finishLoading(browser, wait)
-  browser.find_element(:xpath, "//span[text()='#{acc_name}']").click
+  retryable_click(browser.find_element(:xpath, "//span[text()='#{acc_name}']"))
   transactions = parse_table(browser, wait, days, type).sort_by { |t| t[:date] }
+  puts "Done parsing tables ..."
 
   f = File.open("exports/#{acc_name}.qif", "w")
   transactions.each do |t|
@@ -113,18 +117,21 @@ username = STDIN.noecho(&:gets).chomp
 printf "\nPassword: "
 password = STDIN.noecho(&:gets).chomp
 
-puts "\nLaunching ..."
-wait = Selenium::WebDriver::Wait.new(:timeout => 15)
-browser = Selenium::WebDriver.for :chrome
+puts "\nLaunching website ..."
+wait = Selenium::WebDriver::Wait.new(:timeout => 60)
+options = Selenium::WebDriver::Chrome::Options.new
+options.headless! # remove to debug
+browser = Selenium::WebDriver.for(:chrome, options: options)
+browser.manage.window.resize_to(1024, 768)
 browser.navigate.to "https://www.maybank2u.com.my/home/m2u/common/login.do"
 
-puts "Username field visible ..." if wait.until {
+wait.until {
   browser.find_element(:id, "username").displayed?
 }
 
 puts "Entering username ..."
 browser.find_element(:id, "username").send_keys username
-browser.find_element(:name, "button").click
+retryable_click(browser.find_element(:name, "button"))
 
 puts "Verification image loaded ..." if wait.until {
   browser.find_element(:class, "btn-success").displayed?
@@ -134,15 +141,15 @@ puts "Verification image loaded ..." if wait.until {
 # answer = gets.chomp
 # raise "Invalid verification image!" if answer != "Y"
 
-browser.find_element(:class, "btn-success").click
+retryable_click(browser.find_element(:class, "btn-success"))
 
-puts "Password field visible" if wait.until {
+wait.until {
   browser.find_element(:id, "my-password-input").displayed?
 }
 
 puts "Entering password ..."
 browser.find_element(:id, "my-password-input").send_keys password
-browser.find_element(:class, "btn-success").click
+retryable_click(browser.find_element(:class, "btn-success"))
 
 puts "Successful login" if wait.until {
   /Your last login was on/.match(browser.page_source)
