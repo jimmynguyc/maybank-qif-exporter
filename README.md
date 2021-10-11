@@ -1,6 +1,6 @@
 Export Maybank transactions into QIF files
 
-# Disclimer
+# Disclaimer
 Developers assume no liability and are not responsible for any misuse or damage caused by this program. 
 
 # How to use
