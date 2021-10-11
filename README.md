@@ -1,7 +1,7 @@
 Export Maybank transactions into QIF files
 
 # Disclaimer
-Developers assume no liability and are not responsible for any misuse or damage caused by this program. 
+The developer(s) assume no liability and are not responsible for any misuse or damage caused by this program. Use at your own risk.
 
 # How to use
 
