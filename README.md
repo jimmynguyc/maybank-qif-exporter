@@ -1,5 +1,8 @@
 Export Maybank transactions into QIF files
 
+# Disclimer
+Developers assume no liability and are not responsible for any misuse or damage caused by this program. 
+
 # How to use
 
 1. Download Chrome webdriver https://chromedriver.storage.googleapis.com/index.html (find same version with installed Chrome) and add to $PATH directories (e.g. `/usr/local/bin`)
@@ -13,3 +16,8 @@ $ bundle exec ruby exporter.rb                                                  
 Username: 
 Password:
 ```
+
+# Notes
+
+1. Running it too frequently may trigger password reset.
+2. Made to work with M2U personnal account type as of 11 Oct 2021. Future updates on UI will break code.
