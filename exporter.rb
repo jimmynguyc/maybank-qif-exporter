@@ -71,6 +71,7 @@ def parse_table(browser, wait, days, type, first = true, transactions = [], page
     wait.until do
       next_button.displayed?
     end
+    sleep rand(1..5)
     retryable_click(next_button)
     page += 1
     parse_table(browser, wait, days, type, false, transactions, page)
